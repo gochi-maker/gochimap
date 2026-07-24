@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고치맵</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <div id="app">
+    <header id="search-bar">
+      <input id="search-input" type="text" placeholder="장소, 주소, 카테고리로 검색" autocomplete="off" />
+      <button id="search-button" type="button">검색</button>
+      <span id="result-count"></span>
+    </header>
+    <nav id="category-filter"></nav>
+    <main>
+      <aside id="place-list"></aside>
+      <div id="map"></div>
+    </main>
+  </div>
+
+  {% if naver_map_client_id %}
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ naver_map_client_id }}"></script>
+  {% else %}
+  <script>
+    console.error("NAVER_MAP_CLIENT_ID가 설정되지 않았습니다. .env 파일을 확인하세요.");
+  </script>
+  {% endif %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

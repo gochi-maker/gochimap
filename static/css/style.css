@@ -1,0 +1,132 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+#search-input {
+  flex: 1;
+  max-width: 420px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+#search-button {
+  padding: 10px 16px;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#search-button:hover {
+  opacity: 0.9;
+}
+
+#result-count {
+  margin-left: auto;
+  color: #fff;
+  font-size: 13px;
+}
+
+#category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  z-index: 9;
+}
+
+#category-filter button {
+  padding: 6px 14px;
+  border: 1px solid #d0d0d0;
+  border-radius: 999px;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#category-filter button:hover {
+  border-color: #000;
+}
+
+#category-filter button.active {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+  font-weight: 600;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+#place-list {
+  width: 300px;
+  overflow-y: auto;
+  border-right: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+
+#place-list .place-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+#place-list .place-item:hover {
+  background: #eee;
+}
+
+#place-list .place-item .place-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#place-list .place-item .place-meta {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #777;
+}
+
+#place-list .empty {
+  padding: 24px 16px;
+  color: #999;
+  font-size: 13px;
+  text-align: center;
+}
+
+#map {
+  flex: 1;
+  height: 100%;
+}
