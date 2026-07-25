@@ -27,6 +27,7 @@
     console.error("NAVER_MAP_CLIENT_ID가 설정되지 않았습니다. .env 파일을 확인하세요.");
   </script>
   {% endif %}
+  <script src="{{ url_for('static', filename='js/vendor/MarkerClustering.js') }}"></script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

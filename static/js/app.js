@@ -3,9 +3,22 @@ const SEOUL_CENTER = { lat: 37.5665, lng: 126.978 };
 const state = {
   map: null,
   markers: [],
+  clustering: null,
   infoWindow: null,
   selectedCategory: "",
 };
+
+// 클러스터 마커 아이콘: 개수 구간(10/100/1000)에 따라 점점 커지는 원형 배지 4단계.
+const CLUSTER_ICON_SIZES = [32, 40, 52, 64];
+const CLUSTER_INDEX_GENERATOR = [10, 100, 1000];
+
+function makeClusterIcon(size) {
+  return {
+    content: `<div class="cluster-marker" style="width:${size}px;height:${size}px;font-size:${Math.round(size * 0.24)}px;"></div>`,
+    size: new naver.maps.Size(size, size),
+    anchor: new naver.maps.Point(size / 2, size / 2),
+  };
+}
 
 function initMap() {
   if (typeof naver === "undefined") {
@@ -20,6 +33,10 @@ function initMap() {
 }
 
 function clearMarkers() {
+  if (state.clustering) {
+    state.clustering.setMap(null);
+    state.clustering = null;
+  }
   state.markers.forEach((marker) => marker.setMap(null));
   state.markers = [];
 }
@@ -40,20 +57,43 @@ function buildInfoContent(place) {
   `;
 }
 
-function focusPlace(place, marker) {
+function focusPlace(place) {
   if (!state.map) return;
-  state.map.panTo(new naver.maps.LatLng(place.lat, place.lng));
+  // 클러스터 안에 숨어있는 마커일 수도 있으므로, 마커가 아니라 좌표에 직접 InfoWindow를 띄운다.
+  const position = new naver.maps.LatLng(place.lat, place.lng);
+  state.map.panTo(position);
   state.infoWindow.setContent(buildInfoContent(place));
-  state.infoWindow.open(state.map, marker);
+  state.infoWindow.open(state.map, position);
 }
 
 function renderMarkers(places) {
   clearMarkers();
-  places.forEach((place) => {
+
+  const markers = places.map((place) => {
     const position = new naver.maps.LatLng(place.lat, place.lng);
-    const marker = new naver.maps.Marker({ position, map: state.map, title: place.name });
-    naver.maps.Event.addListener(marker, "click", () => focusPlace(place, marker));
-    state.markers.push(marker);
+    const marker = new naver.maps.Marker({ position, title: place.name });
+    naver.maps.Event.addListener(marker, "click", () => focusPlace(place));
+    return marker;
+  });
+
+  state.markers = markers;
+  if (markers.length === 0) return;
+
+  // 마커를 지도에 바로 올리지 않고 클러스터링에 맡긴다: 화면에 보이는 만큼만 그려서
+  // 수천 개의 마커를 한꺼번에 렌더링할 때의 성능 저하를 막는다.
+  state.clustering = new MarkerClustering({
+    map: state.map,
+    markers,
+    gridSize: 100,
+    minClusterSize: 31,
+    maxZoom: 15,
+    disableClickZoom: false,
+    icons: CLUSTER_ICON_SIZES.map(makeClusterIcon),
+    indexGenerator: CLUSTER_INDEX_GENERATOR,
+    stylingFunction: (clusterMarker, count) => {
+      const badge = clusterMarker.getElement().firstElementChild;
+      if (badge) badge.textContent = count;
+    },
   });
 }
 

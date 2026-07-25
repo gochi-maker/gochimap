@@ -130,3 +130,16 @@ main {
   flex: 1;
   height: 100%;
 }
+
+.cluster-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  font-weight: 400;
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
