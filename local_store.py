@@ -40,6 +40,9 @@ class LocalPlacesStore:
                     {
                         "name": row.get("name", ""),
                         "address": row.get("address", ""),
+                        "jibun_address": row.get("jibun_address", ""),
+                        "district": row.get("district", ""),
+                        "dong": row.get("dong", ""),
                         "category": row.get("category", ""),
                         "description": row.get("description", ""),
                         "url": row.get("url", ""),

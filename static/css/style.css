@@ -53,14 +53,35 @@ html, body {
   font-size: 13px;
 }
 
-#category-filter {
+#filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 16px;
   padding: 10px 16px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   z-index: 9;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+#category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 #category-filter button {
@@ -83,6 +104,26 @@ html, body {
   border-color: #000;
   color: #fff;
   font-weight: 600;
+}
+
+#location-filter {
+  display: flex;
+  gap: 8px;
+}
+
+#location-filter select {
+  padding: 6px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#location-filter select:disabled {
+  color: #aaa;
+  cursor: not-allowed;
 }
 
 main {

@@ -14,7 +14,18 @@ from sheets import SheetPlacesStore
 load_dotenv()
 
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "data", "places.csv")
-FIELDNAMES = ["name", "address", "category", "description", "url", "lat", "lng"]
+FIELDNAMES = [
+    "name",
+    "address",
+    "jibun_address",
+    "district",
+    "dong",
+    "category",
+    "description",
+    "url",
+    "lat",
+    "lng",
+]
 
 
 def main():
@@ -27,6 +38,9 @@ def main():
             "lat": os.environ.get("GOOGLE_SHEET_COL_LAT", ""),
             "lng": os.environ.get("GOOGLE_SHEET_COL_LNG", ""),
             "address": os.environ.get("GOOGLE_SHEET_COL_ADDRESS", ""),
+            "jibun_address": os.environ.get("GOOGLE_SHEET_COL_JIBUN_ADDRESS", ""),
+            "district": os.environ.get("GOOGLE_SHEET_COL_DISTRICT", ""),
+            "dong": os.environ.get("GOOGLE_SHEET_COL_DONG", ""),
             "category": os.environ.get("GOOGLE_SHEET_COL_CATEGORY", ""),
             "description": os.environ.get("GOOGLE_SHEET_COL_DESCRIPTION", ""),
             "url": os.environ.get("GOOGLE_SHEET_COL_URL", ""),

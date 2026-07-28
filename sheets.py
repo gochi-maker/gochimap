@@ -12,6 +12,9 @@ import requests
 FIELD_ALIASES = {
     "name": {"name", "이름", "명칭", "장소명", "장소", "상호명", "상호"},
     "address": {"address", "주소"},
+    "jibun_address": {"jibun_address", "지번주소", "지번 주소", "지번"},
+    "district": {"district", "행정구", "구", "시군구", "시군구명"},
+    "dong": {"dong", "동", "법정동", "법정동명"},
     "category": {"category", "카테고리", "분류", "태그"},
     "lat": {"lat", "latitude", "위도"},
     "lng": {"lng", "lon", "longitude", "경도"},
@@ -26,6 +29,9 @@ SAMPLE_PLACES = [
     {
         "name": "서울시청",
         "address": "서울 중구 세종대로 110",
+        "jibun_address": "서울 중구 태평로1가 31",
+        "district": "중구",
+        "dong": "태평로1가",
         "category": "공공기관",
         "description": "서울특별시청 본관 (샘플 데이터)",
         "url": "",
@@ -35,6 +41,9 @@ SAMPLE_PLACES = [
     {
         "name": "강남역",
         "address": "서울 강남구 강남대로 396",
+        "jibun_address": "서울 강남구 역삼동 858",
+        "district": "강남구",
+        "dong": "역삼동",
         "category": "교통",
         "description": "지하철 2호선/신분당선 환승역 (샘플 데이터)",
         "url": "",
@@ -44,6 +53,9 @@ SAMPLE_PLACES = [
     {
         "name": "경복궁",
         "address": "서울 종로구 사직로 161",
+        "jibun_address": "서울 종로구 세종로 1-1",
+        "district": "종로구",
+        "dong": "세종로",
         "category": "관광지",
         "description": "조선 왕조의 법궁 (샘플 데이터)",
         "url": "",
@@ -134,6 +146,9 @@ def _parse_rows_by_column_letters(csv_text, column_map):
             {
                 "name": name,
                 "address": _row_value(row, index_map.get("address")),
+                "jibun_address": _row_value(row, index_map.get("jibun_address")),
+                "district": _row_value(row, index_map.get("district")),
+                "dong": _row_value(row, index_map.get("dong")),
                 "category": _row_value(row, index_map.get("category")),
                 "description": _row_value(row, index_map.get("description")),
                 "url": _row_value(row, index_map.get("url")),
@@ -167,6 +182,9 @@ def _parse_rows_by_header(csv_text):
             {
                 "name": normalized.get("name", ""),
                 "address": normalized.get("address", ""),
+                "jibun_address": normalized.get("jibun_address", ""),
+                "district": normalized.get("district", ""),
+                "dong": normalized.get("dong", ""),
                 "category": normalized.get("category", ""),
                 "description": normalized.get("description", ""),
                 "url": normalized.get("url", ""),

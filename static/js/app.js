@@ -5,7 +5,10 @@ const state = {
   markers: [],
   clustering: null,
   infoWindow: null,
-  selectedCategory: "",
+  selectedCategories: new Set(),
+  selectedDistrict: "",
+  selectedDong: "",
+  districts: {},
 };
 
 // 클러스터 마커 아이콘: 개수 구간(10/100/1000)에 따라 점점 커지는 원형 배지 4단계.
@@ -118,10 +121,12 @@ function renderList(places) {
   });
 }
 
-async function fetchPlaces(query, category) {
+async function fetchPlaces(query, categories, district, dong) {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
-  if (category) params.set("category", category);
+  categories.forEach((category) => params.append("category", category));
+  if (district) params.set("district", district);
+  if (dong) params.set("dong", dong);
   const qs = params.toString();
   const url = qs ? `/api/places?${qs}` : "/api/places";
   const response = await fetch(url);
@@ -142,13 +147,22 @@ async function fetchCategories() {
   return data.categories;
 }
 
+async function fetchDistricts() {
+  const response = await fetch("/api/districts");
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "행정구 정보를 불러오지 못했습니다.");
+  }
+  return data.districts;
+}
+
 async function search(query) {
   const countEl = document.getElementById("result-count");
   // 검색어가 있으면 카테고리 필터는 무시하고 전체에서 검색한다.
-  const categoryParam = query ? "" : state.selectedCategory;
-  setActiveFilterButton(categoryParam);
+  const categoryParams = query ? [] : Array.from(state.selectedCategories);
+  setActiveFilterButtons(categoryParams);
   try {
-    const places = await fetchPlaces(query, categoryParam);
+    const places = await fetchPlaces(query, categoryParams, state.selectedDistrict, state.selectedDong);
     if (state.map) {
       renderMarkers(places);
     }
@@ -160,16 +174,22 @@ async function search(query) {
   }
 }
 
-function setActiveFilterButton(category) {
+function setActiveFilterButtons(categories) {
+  const active = new Set(categories);
   const buttons = document.querySelectorAll("#category-filter button");
   buttons.forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.category === category);
+    btn.classList.toggle("active", active.has(btn.dataset.category));
   });
 }
 
-function selectCategory(category) {
-  state.selectedCategory = category;
-  // 카테고리를 고르면 검색어는 비워서 카테고리 필터가 바로 적용되게 한다.
+function toggleCategory(category) {
+  // 여러 유형을 함께 선택할 수 있도록 클릭할 때마다 켜고 끈다. 아무것도 선택 안 하면 전체를 보여준다.
+  if (state.selectedCategories.has(category)) {
+    state.selectedCategories.delete(category);
+  } else {
+    state.selectedCategories.add(category);
+  }
+  // 필터를 바꾸면 검색어는 비워서 필터가 바로 적용되게 한다.
   const input = document.getElementById("search-input");
   input.value = "";
   search("");
@@ -184,8 +204,47 @@ function renderCategoryFilter(categories) {
     button.type = "button";
     button.textContent = top;
     button.dataset.category = top;
-    button.addEventListener("click", () => selectCategory(top));
+    button.addEventListener("click", () => toggleCategory(top));
     el.appendChild(button);
+  });
+}
+
+function populateDongOptions(district) {
+  const dongSelect = document.getElementById("dong-select");
+  dongSelect.innerHTML = '<option value="">동 전체</option>';
+
+  const dongs = state.districts[district] || [];
+  dongSelect.disabled = dongs.length === 0;
+  dongs.forEach((dong) => {
+    const option = document.createElement("option");
+    option.value = dong;
+    option.textContent = dong;
+    dongSelect.appendChild(option);
+  });
+}
+
+function renderLocationFilter(districts) {
+  state.districts = districts;
+
+  const districtSelect = document.getElementById("district-select");
+  Object.keys(districts).forEach((district) => {
+    const option = document.createElement("option");
+    option.value = district;
+    option.textContent = district;
+    districtSelect.appendChild(option);
+  });
+
+  districtSelect.addEventListener("change", () => {
+    state.selectedDistrict = districtSelect.value;
+    state.selectedDong = "";
+    populateDongOptions(state.selectedDistrict);
+    search(document.getElementById("search-input").value.trim());
+  });
+
+  const dongSelect = document.getElementById("dong-select");
+  dongSelect.addEventListener("change", () => {
+    state.selectedDong = dongSelect.value;
+    search(document.getElementById("search-input").value.trim());
   });
 }
 
@@ -207,7 +266,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     const categories = await fetchCategories();
     renderCategoryFilter(categories);
-    state.selectedCategory = Object.keys(categories)[0] || "";
+    const firstCategory = Object.keys(categories)[0];
+    if (firstCategory) state.selectedCategories.add(firstCategory);
+  } catch (err) {
+    console.error(err.message);
+  }
+  try {
+    const districts = await fetchDistricts();
+    renderLocationFilter(districts);
   } catch (err) {
     console.error(err.message);
   }

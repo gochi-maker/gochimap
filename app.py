@@ -30,10 +30,36 @@ def api_categories():
     return jsonify({"categories": category_tree.as_dict()})
 
 
+@app.route("/api/districts")
+def api_districts():
+    try:
+        places = store.get_places()
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 502
+
+    # 행정구 -> 동 목록 (실제 데이터에 존재하는 값만, 가나다순)
+    districts = {}
+    for place in places:
+        district = place.get("district", "").strip()
+        dong = place.get("dong", "").strip()
+        if not district:
+            continue
+        dongs = districts.setdefault(district, set())
+        if dong:
+            dongs.add(dong)
+
+    result = {
+        district: sorted(dongs) for district, dongs in sorted(districts.items())
+    }
+    return jsonify({"districts": result})
+
+
 @app.route("/api/places")
 def api_places():
     query = request.args.get("q", "").strip().lower()
-    top_category = request.args.get("category", "").strip()
+    top_categories = {c.strip() for c in request.args.getlist("category") if c.strip()}
+    district = request.args.get("district", "").strip()
+    dong = request.args.get("dong", "").strip()
 
     try:
         places = store.get_places()
@@ -45,8 +71,14 @@ def api_places():
         for place in places
     ]
 
-    if top_category:
-        places = [place for place in places if place["topCategory"] == top_category]
+    if top_categories:
+        places = [place for place in places if place["topCategory"] in top_categories]
+
+    if district:
+        places = [place for place in places if place["district"] == district]
+
+    if dong:
+        places = [place for place in places if place["dong"] == dong]
 
     if query:
         places = [
