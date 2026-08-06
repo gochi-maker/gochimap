@@ -20,6 +20,16 @@ FIELD_ALIASES = {
     "lng": {"lng", "lon", "longitude", "경도"},
     "description": {"description", "설명", "메모", "소개"},
     "url": {"url", "link", "링크", "홈페이지"},
+    "tel": {"tel", "phone", "전화", "전화번호", "연락처"},
+    "kakaomap": {
+        "kakaomap",
+        "kakao_map",
+        "카카오맵",
+        "카카오맵링크",
+        "카카오맵 링크",
+        "카카오맵url",
+        "카카오맵 url",
+    },
 }
 
 REQUIRED_FIELDS = ("name", "lat", "lng")
@@ -35,6 +45,8 @@ SAMPLE_PLACES = [
         "category": "공공기관",
         "description": "서울특별시청 본관 (샘플 데이터)",
         "url": "",
+        "tel": "",
+        "kakaomap": "",
         "lat": 37.5665,
         "lng": 126.9780,
     },
@@ -47,6 +59,8 @@ SAMPLE_PLACES = [
         "category": "교통",
         "description": "지하철 2호선/신분당선 환승역 (샘플 데이터)",
         "url": "",
+        "tel": "",
+        "kakaomap": "",
         "lat": 37.4979,
         "lng": 127.0276,
     },
@@ -59,6 +73,8 @@ SAMPLE_PLACES = [
         "category": "관광지",
         "description": "조선 왕조의 법궁 (샘플 데이터)",
         "url": "",
+        "tel": "",
+        "kakaomap": "",
         "lat": 37.5796,
         "lng": 126.9770,
     },
@@ -152,6 +168,8 @@ def _parse_rows_by_column_letters(csv_text, column_map):
                 "category": _row_value(row, index_map.get("category")),
                 "description": _row_value(row, index_map.get("description")),
                 "url": _row_value(row, index_map.get("url")),
+                "tel": _row_value(row, index_map.get("tel")),
+                "kakaomap": _row_value(row, index_map.get("kakaomap")),
                 "lat": lat,
                 "lng": lng,
             }
@@ -188,6 +206,8 @@ def _parse_rows_by_header(csv_text):
                 "category": normalized.get("category", ""),
                 "description": normalized.get("description", ""),
                 "url": normalized.get("url", ""),
+                "tel": normalized.get("tel", ""),
+                "kakaomap": normalized.get("kakaomap", ""),
                 "lat": lat,
                 "lng": lng,
             }

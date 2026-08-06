@@ -160,6 +160,10 @@ main {
   color: #777;
 }
 
+#place-list .place-item .place-contact-row {
+  margin-top: 10px;
+}
+
 #place-list .empty {
   padding: 24px 16px;
   color: #999;
@@ -183,4 +187,101 @@ main {
   font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   cursor: pointer;
+}
+
+.place-contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.place-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.place-inline-link:hover {
+  border-color: #000;
+}
+
+.place-inline-link-phone {
+  background: #f7f7f7;
+}
+
+.place-inline-link-kakao {
+  background: #fee500;
+  border-color: #e2ce00;
+  color: #191919;
+}
+
+.place-inline-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.place-inline-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.place-inline-icon-kakao {
+  color: #191919;
+}
+
+.place-info-window {
+  min-width: 220px;
+  padding: 10px 12px;
+}
+
+.place-info-window-name {
+  display: block;
+  font-size: 14px;
+}
+
+.place-info-window-category {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.place-info-window-address {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #333;
+}
+
+.place-info-window-description {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.place-info-window-contact {
+  margin-top: 10px;
+}
+
+.place-info-window-actions {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  #place-list {
+    width: 260px;
+  }
 }

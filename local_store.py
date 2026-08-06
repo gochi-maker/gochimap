@@ -48,6 +48,8 @@ class LocalPlacesStore:
                         "url": row.get("url", ""),
                         "lat": lat,
                         "lng": lng,
+                        "tel": row.get("tel", ""),
+                        "kakaomap": row.get("kakaomap", ""),
                     }
                 )
 

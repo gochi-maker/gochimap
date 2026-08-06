@@ -6,6 +6,7 @@
 
 import csv
 import os
+import re
 
 from dotenv import load_dotenv
 
@@ -23,9 +24,38 @@ FIELDNAMES = [
     "category",
     "description",
     "url",
+    "tel",
+    "kakaomap",
     "lat",
     "lng",
 ]
+
+def extract_hyperlink_url(value: str) -> str:
+    if not value:
+        return ""
+
+    value = str(value).strip()
+
+    match = re.search(
+        r'=HYPERLINK\(\s*"([^"]+)"',
+        value,
+        flags=re.IGNORECASE,
+    )
+
+    if match:
+        return match.group(1)
+
+    if value.startswith(("http://", "https://")):
+        return value
+
+    return ""
+
+
+def normalize_link_value(value: str) -> str:
+    hyperlink_url = extract_hyperlink_url(value)
+    if hyperlink_url:
+        return hyperlink_url
+    return str(value or "").strip()
 
 
 def main():
@@ -38,24 +68,44 @@ def main():
             "lat": os.environ.get("GOOGLE_SHEET_COL_LAT", ""),
             "lng": os.environ.get("GOOGLE_SHEET_COL_LNG", ""),
             "address": os.environ.get("GOOGLE_SHEET_COL_ADDRESS", ""),
-            "jibun_address": os.environ.get("GOOGLE_SHEET_COL_JIBUN_ADDRESS", ""),
+            "jibun_address": os.environ.get(
+                "GOOGLE_SHEET_COL_JIBUN_ADDRESS", ""
+            ),
             "district": os.environ.get("GOOGLE_SHEET_COL_DISTRICT", ""),
             "dong": os.environ.get("GOOGLE_SHEET_COL_DONG", ""),
             "category": os.environ.get("GOOGLE_SHEET_COL_CATEGORY", ""),
-            "description": os.environ.get("GOOGLE_SHEET_COL_DESCRIPTION", ""),
+            "description": os.environ.get(
+                "GOOGLE_SHEET_COL_DESCRIPTION", ""
+            ),
             "url": os.environ.get("GOOGLE_SHEET_COL_URL", ""),
+            "kakaomap": os.environ.get(
+                "GOOGLE_SHEET_COL_KAKAOMAP", ""
+            ),
+            "tel": os.environ.get("GOOGLE_SHEET_COL_TEL", ""),
         },
     )
+
     places = store.get_places(force_refresh=True)
 
+    for place in places:
+        place["url"] = normalize_link_value(place.get("url", ""))
+        place["kakaomap"] = normalize_link_value(place.get("kakaomap", ""))
+        place["tel"] = str(place.get("tel", "") or "").strip()
+
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8-sig", newline="") as f:
+
+    with open(
+        OUTPUT_PATH,
+        "w",
+        encoding="utf-8-sig",
+        newline="",
+    ) as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
         writer.writerows(places)
 
     print(f"{len(places)}개 장소를 {OUTPUT_PATH}에 저장했습니다.")
-
-
+    
+    
 if __name__ == "__main__":
     main()

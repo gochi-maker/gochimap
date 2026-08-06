@@ -14,6 +14,16 @@ const state = {
 // 클러스터 마커 아이콘: 개수 구간(10/100/1000)에 따라 점점 커지는 원형 배지 4단계.
 const CLUSTER_ICON_SIZES = [32, 40, 52, 64];
 const CLUSTER_INDEX_GENERATOR = [10, 100, 1000];
+const PHONE_ICON = `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.11.37 2.3.56 3.58.56a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.28.19 2.47.56 3.58a1 1 0 0 1-.24 1.01l-2.2 2.2Z"></path>
+  </svg>
+`;
+const MAP_ICON = `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2C8.14 2 5 5.14 5 9c0 5.02 6.15 11.97 6.41 12.26a.8.8 0 0 0 1.18 0C12.85 20.97 19 14.02 19 9c0-3.86-3.14-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"></path>
+  </svg>
+`;
 
 function makeClusterIcon(size) {
   return {
@@ -44,18 +54,98 @@ function clearMarkers() {
   state.markers = [];
 }
 
-function buildInfoContent(place) {
-  const safe = (value) => (value ? value.replace(/</g, "&lt;") : "");
-  const link = place.url
-    ? `<a href="${safe(place.url)}" target="_blank" rel="noopener">바로가기</a>`
-    : "";
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, (char) => {
+    const entityMap = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entityMap[char];
+  });
+}
+
+function normalizeExternalUrl(value) {
+  const url = String(value || "").trim();
+  return /^https?:\/\//i.test(url) ? url : "";
+}
+
+function normalizePhoneHref(value) {
+  return String(value || "").replace(/[^0-9+]/g, "");
+}
+
+function buildPhoneLink(phone) {
+  if (!phone) {
+    return "";
+  }
+
+  const href = normalizePhoneHref(phone);
+  if (!href) {
+    return "";
+  }
+
   return `
-    <div style="padding:10px 12px;min-width:180px;">
-      <strong>${safe(place.name)}</strong><br/>
-      <span style="font-size:12px;color:#666;">${safe(place.category)}</span><br/>
-      <span style="font-size:12px;">${safe(place.address)}</span>
-      ${place.description ? `<p style="font-size:12px;margin:6px 0 0;">${safe(place.description)}</p>` : ""}
-      ${link}
+    <a class="place-inline-link place-inline-link-phone" href="tel:${escapeHtml(href)}">
+      <span class="place-inline-icon" aria-hidden="true">${PHONE_ICON}</span>
+      <span>${escapeHtml(phone)}</span>
+    </a>
+  `;
+}
+
+function buildKakaoLink(url) {
+  const href = normalizeExternalUrl(url);
+  if (!href) {
+    return "";
+  }
+
+  return `
+    <a class="place-inline-link place-inline-link-kakao" href="${escapeHtml(href)}" target="_blank" rel="noopener">
+      <span class="place-inline-icon place-inline-icon-kakao" aria-hidden="true">${MAP_ICON}</span>
+      <span>카카오맵</span>
+    </a>
+  `;
+}
+
+function buildUrlLink(url) {
+  const href = normalizeExternalUrl(url);
+  if (!href) {
+    return "";
+  }
+
+  return `
+    <a class="place-inline-link" href="${escapeHtml(href)}" target="_blank" rel="noopener">
+      <span>링크 바로가기</span>
+    </a>
+  `;
+}
+
+function buildContactRow(place) {
+  const items = [buildPhoneLink(place.tel), buildKakaoLink(place.kakaomap)].filter(Boolean);
+  if (items.length === 0) {
+    return "";
+  }
+
+  return `<div class="place-contact-row">${items.join("")}</div>`;
+}
+
+function bindItemLinks(container) {
+  container.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", (event) => event.stopPropagation());
+  });
+}
+
+function buildInfoContent(place) {
+  const actions = [buildKakaoLink(place.kakaomap), buildUrlLink(place.url)].filter(Boolean);
+  return `
+    <div class="place-info-window">
+      <strong class="place-info-window-name">${escapeHtml(place.name)}</strong>
+      <span class="place-info-window-category">${escapeHtml(place.category)}</span>
+      <span class="place-info-window-address">${escapeHtml(place.address)}</span>
+      ${place.description ? `<p class="place-info-window-description">${escapeHtml(place.description)}</p>` : ""}
+      ${place.tel ? `<div class="place-info-window-contact">${buildPhoneLink(place.tel)}</div>` : ""}
+      ${actions.length > 0 ? `<div class="place-contact-row place-info-window-actions">${actions.join("")}</div>` : ""}
     </div>
   `;
 }
@@ -67,6 +157,42 @@ function focusPlace(place) {
   state.map.panTo(position);
   state.infoWindow.setContent(buildInfoContent(place));
   state.infoWindow.open(state.map, position);
+}
+
+function resetMapViewport() {
+  if (!state.map) return;
+  state.infoWindow.close();
+  state.map.setCenter(new naver.maps.LatLng(SEOUL_CENTER.lat, SEOUL_CENTER.lng));
+  state.map.setZoom(11);
+}
+
+function focusMapToPlaces(places) {
+  if (!state.map) return;
+
+  if (!places.length) {
+    if (!state.selectedDistrict && !state.selectedDong) {
+      resetMapViewport();
+    }
+    return;
+  }
+
+  state.infoWindow.close();
+
+  if (places.length === 1) {
+    const position = new naver.maps.LatLng(places[0].lat, places[0].lng);
+    state.map.panTo(position);
+    state.map.setZoom(15);
+    return;
+  }
+
+  const firstPosition = new naver.maps.LatLng(places[0].lat, places[0].lng);
+  const bounds = new naver.maps.LatLngBounds(firstPosition, firstPosition);
+
+  places.slice(1).forEach((place) => {
+    bounds.extend(new naver.maps.LatLng(place.lat, place.lng));
+  });
+
+  state.map.fitBounds(bounds);
 }
 
 function renderMarkers(places) {
@@ -112,11 +238,14 @@ function renderList(places) {
   places.forEach((place, index) => {
     const item = document.createElement("div");
     item.className = "place-item";
+    const meta = `${place.category || ""}${place.address ? ` ${place.category ? "· " : ""}${place.address}` : ""}`;
     item.innerHTML = `
-      <div class="place-name">${place.name}</div>
-      <div class="place-meta">${place.category || ""} ${place.address ? "· " + place.address : ""}</div>
+      <div class="place-name">${escapeHtml(place.name)}</div>
+      <div class="place-meta">${escapeHtml(meta.trim())}</div>
+      ${buildContactRow(place)}
     `;
     item.addEventListener("click", () => focusPlace(place, state.markers[index]));
+    bindItemLinks(item);
     listEl.appendChild(item);
   });
 }
@@ -156,7 +285,7 @@ async function fetchDistricts() {
   return data.districts;
 }
 
-async function search(query) {
+async function search(query, options = {}) {
   const countEl = document.getElementById("result-count");
   // 검색어가 있으면 카테고리 필터는 무시하고 전체에서 검색한다.
   const categoryParams = query ? [] : Array.from(state.selectedCategories);
@@ -165,6 +294,13 @@ async function search(query) {
     const places = await fetchPlaces(query, categoryParams, state.selectedDistrict, state.selectedDong);
     if (state.map) {
       renderMarkers(places);
+      if (options.focusViewport) {
+        if (state.selectedDistrict || state.selectedDong) {
+          focusMapToPlaces(places);
+        } else {
+          resetMapViewport();
+        }
+      }
     }
     renderList(places);
     countEl.textContent = `${places.length}개 결과`;
@@ -238,13 +374,17 @@ function renderLocationFilter(districts) {
     state.selectedDistrict = districtSelect.value;
     state.selectedDong = "";
     populateDongOptions(state.selectedDistrict);
-    search(document.getElementById("search-input").value.trim());
+    search(document.getElementById("search-input").value.trim(), {
+      focusViewport: true,
+    });
   });
 
   const dongSelect = document.getElementById("dong-select");
   dongSelect.addEventListener("change", () => {
     state.selectedDong = dongSelect.value;
-    search(document.getElementById("search-input").value.trim());
+    search(document.getElementById("search-input").value.trim(), {
+      focusViewport: true,
+    });
   });
 }
 
