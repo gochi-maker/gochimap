@@ -9,6 +9,9 @@
 <body>
   <div id="app">
     <header id="site-header">
+      <a id="site-logo" href="/" aria-label="고치맵 홈">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="고치맵" />
+      </a>
       <div id="search-bar">
         <label class="sr-only" for="search-input">검색어 입력</label>
         <input id="search-input" type="text" placeholder="장소, 주소, 카테고리로 검색" autocomplete="off" />
