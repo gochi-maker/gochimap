@@ -400,9 +400,45 @@ function setupSearchHandlers() {
   });
 }
 
+function setupHelpDialog() {
+  const dialog = document.getElementById("help-dialog");
+  const openButton = document.getElementById("help-button");
+  const closeButtons = dialog.querySelectorAll("[data-close-help]");
+
+  const closeDialog = () => {
+    dialog.hidden = true;
+    document.body.style.overflow = "";
+    openButton.setAttribute("aria-expanded", "false");
+    openButton.focus();
+  };
+
+  const openDialog = () => {
+    dialog.hidden = false;
+    document.body.style.overflow = "hidden";
+    openButton.setAttribute("aria-expanded", "true");
+    dialog.querySelector(".close-button").focus();
+  };
+
+  openButton.addEventListener("click", openDialog);
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", closeDialog);
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      closeDialog();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !dialog.hidden) {
+      closeDialog();
+    }
+  });
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
   state.map = initMap();
   setupSearchHandlers();
+  setupHelpDialog();
   try {
     const categories = await fetchCategories();
     renderCategoryFilter(categories);

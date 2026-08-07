@@ -8,10 +8,15 @@
 </head>
 <body>
   <div id="app">
-    <header id="search-bar">
-      <input id="search-input" type="text" placeholder="장소, 주소, 카테고리로 검색" autocomplete="off" />
-      <button id="search-button" type="button">검색</button>
-      <span id="result-count"></span>
+    <header id="site-header">
+      <div id="search-bar">
+        <label class="sr-only" for="search-input">검색어 입력</label>
+        <input id="search-input" type="text" placeholder="장소, 주소, 카테고리로 검색" autocomplete="off" />
+        <button id="search-button" type="button">검색</button>
+      </div>
+      <button id="help-button" type="button" aria-label="고치맵 사용 안내 열기" aria-haspopup="dialog" aria-controls="help-dialog" aria-expanded="false">
+        ?
+      </button>
     </header>
     <nav id="filter-bar">
       <div class="filter-group">
@@ -29,11 +34,45 @@
         <span class="filter-label">유형 검색</span>
         <div id="category-filter"></div>
       </div>
+      <span id="result-count" aria-live="polite"></span>
     </nav>
     <main>
       <aside id="place-list"></aside>
       <div id="map"></div>
     </main>
+  </div>
+
+  <div class="dialog-backdrop" id="help-dialog" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-dialog-title">
+      <div class="dialog-head">
+        <h2 id="help-dialog-title">고치맵 사용 안내</h2>
+        <button class="close-button" type="button" aria-label="안내 닫기" data-close-help>×</button>
+      </div>
+      <div class="dialog-body">
+        <p class="dialog-intro">검색과 필터를 함께 쓰면 서울의 수리수선 가게를 더 빠르게 찾을 수 있어요.</p>
+        <div class="help-card-grid">
+          <article class="help-card">
+            <strong>검색</strong>
+            <p>가게명, 주소, 품목 키워드로 전체 목록에서 바로 찾을 수 있습니다.</p>
+          </article>
+          <article class="help-card">
+            <strong>주소 필터</strong>
+            <p>행정구와 동을 고르면 결과 목록과 지도 범위가 함께 바뀝니다.</p>
+          </article>
+          <article class="help-card">
+            <strong>유형 필터</strong>
+            <p>전자제품, 의류/잡화, 집처럼 여러 카테고리를 동시에 켜고 끌 수 있습니다.</p>
+          </article>
+          <article class="help-card">
+            <strong>지도 보기</strong>
+            <p>목록 카드나 마커를 누르면 위치와 연락처, 외부 링크를 바로 확인할 수 있습니다.</p>
+          </article>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="dialog-button secondary" type="button" data-close-help>닫기</button>
+      </div>
+    </section>
   </div>
 
   {% if naver_map_client_id %}
