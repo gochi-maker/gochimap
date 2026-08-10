@@ -467,8 +467,47 @@ main {
 
 .dialog-intro {
   margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ui-black);
+}
+
+.help-info-block {
+  padding: 14px 16px;
+  border: 2px solid var(--ui-black);
+  border-radius: 12px;
+  background: var(--ui-cream);
+  box-shadow: 3px 3px 0 rgba(17, 17, 17, 0.12);
+}
+
+.help-info-block + .help-info-block {
+  margin-top: 14px;
+}
+
+.help-info-block h3 {
+  margin: 0 0 8px;
   font-size: 14px;
+  font-weight: 800;
+  color: var(--ui-blue);
+}
+
+.help-info-block p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
   color: #4f4f49;
+}
+
+.org-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1.5px solid var(--ui-black);
+  border-radius: 999px;
+  background: var(--ui-yellow);
+  color: var(--ui-black);
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .help-card-grid {
