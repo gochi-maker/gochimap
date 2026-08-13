@@ -492,6 +492,16 @@ main {
   color: #4f4f49;
 }
 
+.org-badge a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.org-badge a:hover,
+.org-badge a:focus-visible {
+  text-decoration: underline;
+}
+
 .org-badge {
   display: inline-block;
   padding: 1px 8px;
