@@ -174,7 +174,7 @@ html, body {
   padding: 6px 14px;
   border: 1.5px solid var(--ui-black);
   border-radius: 999px;
-  background: var(--category-tint, #fff);
+  background: #fff;
   color: var(--ui-black);
   font-size: 13px;
   font-weight: 700;
@@ -209,37 +209,31 @@ html, body {
 
 #category-filter button[data-category="전자제품"] {
   --category-color: #149ee2;
-  --category-tint: #e9f6fd;
   --category-ink: var(--ui-black);
 }
 
 #category-filter button[data-category="의류/잡화"] {
   --category-color: #ff96b1;
-  --category-tint: #ffe8ef;
   --category-ink: var(--ui-black);
 }
 
 #category-filter button[data-category="집"] {
   --category-color: #00a03c;
-  --category-tint: #e5f6ec;
   --category-ink: #ffffff;
 }
 
 #category-filter button[data-category="기타"] {
   --category-color: #f3e6c7;
-  --category-tint: #fbf5e8;
   --category-ink: var(--ui-black);
 }
 
 #category-filter button[data-category="이동수단(자동차,자전거)"] {
   --category-color: #ff5321;
-  --category-tint: #ffebe4;
   --category-ink: var(--ui-black);
 }
 
 #category-filter button[data-category="귀금속/악기/안경/시계 등"] {
   --category-color: #ffb203;
-  --category-tint: #fff3cf;
   --category-ink: var(--ui-black);
 }
 

@@ -9,6 +9,7 @@ const state = {
   selectedDistrict: "",
   selectedDong: "",
   districts: {},
+  allCategories: [],
 };
 
 // 클러스터 마커 아이콘: 개수 구간(10/100/1000)에 따라 점점 커지는 원형 배지 4단계.
@@ -288,7 +289,7 @@ async function fetchDistricts() {
 async function search(query, options = {}) {
   const countEl = document.getElementById("result-count");
   // 검색어가 있으면 카테고리 필터는 무시하고 전체에서 검색한다.
-  const categoryParams = query ? [] : Array.from(state.selectedCategories);
+  const categoryParams = query ? state.allCategories : Array.from(state.selectedCategories);
   setActiveFilterButtons(categoryParams);
   try {
     const places = await fetchPlaces(query, categoryParams, state.selectedDistrict, state.selectedDong);
@@ -442,7 +443,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     const categories = await fetchCategories();
     renderCategoryFilter(categories);
-    const firstCategory = Object.keys(categories)[0];
+    state.allCategories = Object.keys(categories);
+    const firstCategory = state.allCategories[0];
     if (firstCategory) state.selectedCategories.add(firstCategory);
   } catch (err) {
     console.error(err.message);

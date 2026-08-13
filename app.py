@@ -71,8 +71,7 @@ def api_places():
         for place in places
     ]
 
-    if top_categories:
-        places = [place for place in places if place["topCategory"] in top_categories]
+    places = [place for place in places if place["topCategory"] in top_categories]
 
     if district:
         places = [place for place in places if place["district"] == district]
